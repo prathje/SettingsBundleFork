@@ -39,7 +39,11 @@ class SettingsManager implements SettingsManagerInterface
         private SerializerInterface $serializer,
         private array $settingsConfiguration = []
     ) {
-        $this->repository = $em->getRepository(Setting::class);
+    }
+
+    public function getRepository()
+    {
+        return $this->em->getRepository(Setting::class);
     }
 
     /**
@@ -164,7 +168,7 @@ class SettingsManager implements SettingsManagerInterface
      */
     private function flush(array $names, ?SettingsOwnerInterface $owner = null): void
     {
-        $settings = $this->repository->findBy([
+        $settings = $this->getRepository()->findBy([
             'name' => $names,
             'ownerId' => $owner?->getSettingIdentifier(),
         ]);
@@ -256,7 +260,7 @@ class SettingsManager implements SettingsManagerInterface
         }
 
         /** @var Setting $setting */
-        foreach ($this->repository->findBy(['ownerId' => $owner?->getSettingIdentifier()]) as $setting) {
+        foreach ($this->getRepository()->findBy(['ownerId' => $owner?->getSettingIdentifier()]) as $setting) {
             if (\array_key_exists($setting->getName(), $settings)) {
                 $settings[$setting->getName()] = $this->serializer->unserialize($setting->getValue());
             }
